@@ -17,7 +17,7 @@
 #define ADDR_FLASH_SECTOR_8     ((uint32_t)0x08080000) 	//扇区8起始地址, 128 Kbytes 
 
 // 系统参数存储
-#define PARA_NUMS 8                               // 需要保存的参数个数 
+#define PARA_NUMS 9                               // 需要保存的参数个数 
 #define PARA_SAVE_ADDR  ADDR_FLASH_SECTOR_7	      // 需要保存的参数的起始地址
 //设置FLASH 保存地址(必须为4的倍数，且所在扇区,要大于本代码所占用到的扇区.
 //否则,写操作的时候,可能会导致擦除整个扇区,从而引起部分程序丢失.引起死机.

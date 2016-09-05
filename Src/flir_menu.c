@@ -835,10 +835,11 @@ void sysConf_init(void)
 		
 		flir_conf.flir_sys_DisMode = color;         // 默认摄像头数据彩色显示
 		flir_conf.flir_sys_ComMode = disable;       // 默认指南针功能开启
+		flir_conf.file_sys_PBWakeup= PBWakeup_None; // 默认PBSTA开机唤醒未按下
 	}
 	else
 	{
-		STMFLASH_Read(PARA_SAVE_ADDR+1,(uint32_t*)datatemp,PARA_NUMS-1);   // 读出7个系统参数
+		STMFLASH_Read(PARA_SAVE_ADDR+1,(uint32_t*)datatemp,PARA_NUMS-1);   // 读出8个系统参数
 
 		// init system configuration
 		flir_conf.flir_sys_Bright = (BrightnessCont_sta)(datatemp[0]>>24);    // 亮度等级   
@@ -850,13 +851,20 @@ void sysConf_init(void)
 		
 		flir_conf.flir_sys_DisMode = (DisplayMode_sta)(datatemp[5]>>24);      // 摄像头数据显示模式（彩色/黑白）
 		flir_conf.flir_sys_ComMode = (CompassMode_sta)(datatemp[6]>>24);      // 指南针功能是否开启
+		
+		flir_conf.file_sys_PBWakeup= (PBWakeup_sta)(datatemp[7]>>24);         // 是否为PBSTA开机唤醒
 	}
-	flir_conf.flir_sys_Baterry = Baterry_high;
-	flir_conf.file_sys_chargingMode = normal; 
-	flir_conf.file_sys_LowPower = Not_LowPower;
 	
-	SET_BGLight(flir_conf.flir_sys_Bright);     // 设置亮度
-	sleep_sta = Sleep_disable;									// 开机状态
+	if(flir_conf.file_sys_PBWakeup == PBWakeup_Down)  // PBSTA开机唤醒
+	{
+		flir_conf.file_sys_PBWakeup= PBWakeup_None;   // 清除PBSTA开机唤醒按键
+		//HAL_Delay(500);
+		if(GPIOB->IDR&0x0001)           // PB0短按，不开机   
+		{
+			flir_conf.file_sys_LowPower = Is_LowPower;        // 状态切换
+			PBsetSandby();
+		}
+	}
 	
 	Time_Sleep = 0;                             // 休眠定时计数器归零
 	switch((int)flir_conf.flir_sys_Sleep)
@@ -898,6 +906,7 @@ void Save_Parameter(void)                     // 保存8个系统参数到FLASH
 	datatemp[5] = (uint32_t)(flir_conf.flir_sys_Reticle[1]+50);
 	datatemp[6] = (uint32_t)flir_conf.flir_sys_DisMode;
 	datatemp[7] = (uint32_t)disable;           // compass off
+	datatemp[8] = (uint32_t)flir_conf.file_sys_PBWakeup;
 	
 	STMFLASH_Write(PARA_SAVE_ADDR,(uint32_t *)datatemp,PARA_NUMS);                      // 保存参数
 }

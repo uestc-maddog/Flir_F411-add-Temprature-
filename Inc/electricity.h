@@ -87,6 +87,19 @@ void Baterrycheck(void);
 void setSandby(void);
 
 /*********************************************************************
+ * @fn        PBsetSandby()
+ *
+ * @brief     configure system to standby mode,
+ *						disable LCD and flir camera.
+ *						call this function before sleep.
+ *
+ * @param     none
+ * 
+ * @return    none
+ */
+void PBsetSandby(void);
+
+/*********************************************************************
  * @fn        CLOCK_OFF()
  *
  * @brief     关闭外设时钟

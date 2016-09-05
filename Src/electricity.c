@@ -140,7 +140,7 @@ void CLOCK_OFF(void)
 	
 	GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_7| GPIO_PIN_8| GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2 | SYSTEM_LED_Pin, GPIO_PIN_SET);   
@@ -228,6 +228,34 @@ void setSandby( void )
 }
 
 /*********************************************************************
+ * @fn        PBsetSandby()
+ *
+ * @brief     configure system to standby mode,
+ *						disable LCD and flir camera.
+ *						call this function before sleep.
+ *
+ * @param     none
+ * 
+ * @return    none
+ */
+void PBsetSandby(void)
+{
+	//sleep state changge to enable.
+	sleep_sta = Sleep_enable;
+	Save_Parameter();                            // 保存8个系统参数到FLASH
+	CLOCK_OFF();                                 // 关闭除外部唤醒中断的外设时钟
+	
+	/*To minimize the consumption In Stop mode, FLASH can be powered off before 
+      entering the Stop mode using the HAL_PWREx_EnableFlashPowerDown() function.
+      It can be switched on again by software after exiting the Stop mode using
+      the HAL_PWREx_DisableFlashPowerDown() function. */
+	HAL_PWREx_EnableFlashPowerDown();
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+	HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+}
+
+/*********************************************************************
  * @fn        setSandby()
  *
  * @brief     configure system to standby mode,
@@ -250,11 +278,11 @@ void setSandby2( void )
 	
 	// configure LCD back light power
 	// re-config the LCD power pin
-	GPIO_InitStruct.Pin = LCD_POWER_PIN;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(LCD_POWER_GPIOX, &GPIO_InitStruct);
+//	GPIO_InitStruct.Pin = LCD_POWER_PIN;
+//  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//  GPIO_InitStruct.Pull = GPIO_NOPULL;
+//  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+//	HAL_GPIO_Init(LCD_POWER_GPIOX, &GPIO_InitStruct);
 	
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);   // LDO OFF
 	
@@ -266,9 +294,6 @@ void setSandby2( void )
 	// congifure flir camera sleep
 	// enable flir power down pin to disable flir camera
 	HAL_GPIO_WritePin(FLIR_POWER_DWN_GPIOX, FLIR_POWER_DWN_PIN, GPIO_PIN_RESET);	// logic-low enable, shutdown sequence
-	
-
-	
 }
 
 

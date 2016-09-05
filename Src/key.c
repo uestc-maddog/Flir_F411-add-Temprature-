@@ -152,7 +152,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   static uint8_t CAPTURE_STA = 0;	   // 捕获状态
 	static uint8_t Temp = 0;	       
-	
+	uint32_t timer = 36000000;
 	/* Prevent unused argument(s) compilation warning */
 	UNUSED(GPIO_Pin);
 		/* NOTE: This function Should not be modified, when the callback is needed,
@@ -160,20 +160,28 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		 */
 	if(GPIO_Pin == GPIO_PIN_0)           // PBSTAT中断
 	{
-		Temp++;
-		if(flir_conf.file_sys_LowPower == Not_LowPower) 
+		HAL_Delay(500);HAL_Delay(500);HAL_Delay(500);
+		if(!(GPIOB->IDR&0x0001))           // PB0下降沿    
 		{
-			flir_conf.file_sys_LowPower = Is_LowPower;        // 状态切换
-			setSandby();                     // 进入低功耗模式
-		}
-		else
-		{
-			flir_conf.file_sys_LowPower = Not_LowPower;       // 状态切换
-			
-			/*  SoftReset  */
-			HAL_PWREx_DisableFlashPowerDown();
-			__set_FAULTMASK(1);                               // 关闭所有中断
-			NVIC_SystemReset();                               // 软件复位
+			//Temp++;
+			if(flir_conf.file_sys_LowPower == Not_LowPower) 
+			{
+				flir_conf.file_sys_LowPower = Is_LowPower;        // 状态切换
+				setSandby();                     // 进入低功耗模式
+			}
+			else
+			{
+//				HAL_Delay(500);HAL_Delay(500);
+//				while(--timer)   ;
+//				if(!(GPIOB->IDR&0x0001))           // PB0下降沿 			
+				flir_conf.file_sys_LowPower = Not_LowPower;       // 状态切换
+				flir_conf.file_sys_PBWakeup = PBWakeup_Down;      // 标记PBSTA开机唤醒键按下
+				Save_Parameter();                                 // 保存9个系统参数到FLASH
+				/*  SoftReset  */
+				HAL_PWREx_DisableFlashPowerDown();
+				__set_FAULTMASK(1);                               // 关闭所有中断
+				NVIC_SystemReset();                               // 软件复位
+			}
 		}
 	}
 	if(GPIO_Pin == GPIO_PIN_12)          // 按键中断

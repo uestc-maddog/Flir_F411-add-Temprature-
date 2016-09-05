@@ -72,7 +72,7 @@ int main(void)
   /* Configure the system clock */ 
   SystemClock_Config();        // 外部+PLL  26MHz
   /* Initialize all configured peripherals */
-	setSandby2();
+	//setSandby2();
 	
   MX_GPIO_Init();
   MX_DMA_Init();
@@ -81,12 +81,12 @@ int main(void)
   MX_SPI1_Init();
 	MX_TIM2_Init();           // 按键时间捕获
 	MX_TIM3_Init();           // Sleep Time      定时器TIM3已开启
-	MX_TIM9_Init();           // LCD_PWM
 	
 	lepton_init();
 	MX_I2C1_Init();
 	
 	sysConf_init();              // 系统参数初始化
+	MX_TIM9_Init();              // LCD_PWM
 	LCD_Init();
 	display_Animation();         // 显示开机界面
 
@@ -293,6 +293,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
+	
+	GPIO_InitStruct.Pin = GPIO_PIN_2;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);     // 关闭LCD灯光
 	
 	/*Configure GPIO pins : SYSTEM_LED_Pin LEPTON_PW_DWN_L_Pin LEPTON_RESET_L_Pin */
   GPIO_InitStruct.Pin = SYSTEM_LED_Pin|LEPTON_PW_DWN_L_Pin|LEPTON_RESET_L_Pin;
