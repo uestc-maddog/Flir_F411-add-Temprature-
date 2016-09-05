@@ -312,6 +312,9 @@ void LCD_Init(void)
 	// polling for 10ms by defaul
 	HAL_DMA_PollForTransfer(&LCD_DMA_PORT,HAL_DMA_FULL_TRANSFER,10);	
 #endif
+
+	HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_1);
+	SET_BGLight(flir_conf.flir_sys_Bright);     // ÉèÖÃÁÁ¶È
 }  
 
 

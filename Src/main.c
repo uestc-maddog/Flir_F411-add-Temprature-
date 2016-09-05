@@ -93,8 +93,6 @@ int main(void)
   init_lepton_command_interface();
   HAL_Delay(500);
   enable_lepton_agc();
-	HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_1);
-	
 	temprature = Get_Temprate();	    // 得到温度值 
 	while (1)
   {
@@ -479,7 +477,7 @@ static void MX_TIM9_Init(void)
 
   HAL_TIM_MspPostInit(&htim9);
 	HAL_TIM_Base_Start(&htim9);
-	HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_1);
+	//HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_1);
 }
 
 /* ADC1 init function */

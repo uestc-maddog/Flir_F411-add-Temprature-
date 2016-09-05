@@ -858,14 +858,22 @@ void sysConf_init(void)
 	if(flir_conf.file_sys_PBWakeup == PBWakeup_Down)  // PBSTA开机唤醒
 	{
 		flir_conf.file_sys_PBWakeup= PBWakeup_None;   // 清除PBSTA开机唤醒按键
-		//HAL_Delay(500);
-		if(GPIOB->IDR&0x0001)           // PB0短按，不开机   
+		
+		if(!(GPIOB->IDR&0x0001))          // PB0按下，不开机   
+		{
+			HAL_Delay(300);
+			if(GPIOB->IDR&0x0001)           // PB0短按，不开机   
+			{
+				flir_conf.file_sys_LowPower = Is_LowPower;        // 状态切换
+				PBsetSandby();
+			}
+		}
+		else                              // PB0松起，不开机 
 		{
 			flir_conf.file_sys_LowPower = Is_LowPower;        // 状态切换
 			PBsetSandby();
 		}
 	}
-	
 	Time_Sleep = 0;                             // 休眠定时计数器归零
 	switch((int)flir_conf.flir_sys_Sleep)
 	{
@@ -931,6 +939,7 @@ void sysConf_Reset(void)
 	
 	flir_conf.flir_sys_DisMode = color;          // 默认摄像头数据彩色显示
 	flir_conf.flir_sys_ComMode = disable;        // 默认指南针功能开启
+	flir_conf.file_sys_PBWakeup= PBWakeup_None;  // 默认PBSTA开机唤醒未按下
 		
 	SET_BGLight(flir_conf.flir_sys_Bright);     // 设置亮度
 	sleep_sta = Sleep_disable;									// 开机状态
