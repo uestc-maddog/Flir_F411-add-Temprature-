@@ -204,6 +204,23 @@ void CLOCK_OFF(void)
  */
 void setSandby( void )
 {
+	//IIC 两脚拉高
+//	GPIO_InitTypeDef GPIO_InitStruct;
+//	
+//	GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
+//  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+//  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);	
+//	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_8,GPIO_PIN_SET);
+//	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_9,GPIO_PIN_SET);
+//	
+//	GPIO_InitStruct.Pin = GPIO_PIN_6;
+//  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+//  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);	
+//	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,GPIO_PIN_SET);
+	
+	
 	//sleep state changge to enable.
 	sleep_sta = Sleep_enable;
 	Save_Parameter();                           // 保存8个系统参数到FLASH

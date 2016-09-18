@@ -861,6 +861,8 @@ void sysConf_init(void)
 		
 		if(!(GPIOB->IDR&0x0001))          // PB0按下，不开机   
 		{
+			HAL_Delay(500);
+			HAL_Delay(500);
 			HAL_Delay(300);
 			if(GPIOB->IDR&0x0001)           // PB0短按，不开机   
 			{
